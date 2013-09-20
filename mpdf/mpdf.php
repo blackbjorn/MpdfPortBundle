@@ -14210,54 +14210,58 @@ function array_merge_recursive_unique($array1, $array2) {
 
 
 function _mergeFullCSS($p, &$t, $tag, $classes, $id) {
+	if (isset($p[$tag]))
 		$this->_mergeCSS($p[$tag], $t);
-		// STYLESHEET CLASS e.g. .smallone{}  .redletter{}
-		foreach($classes AS $class) {
+	// STYLESHEET CLASS e.g. .smallone{}  .redletter{}
+	foreach($classes AS $class) {
+	  if (isset($p['CLASS>>'.$class]))
 		  $this->_mergeCSS($p['CLASS>>'.$class], $t);
-		}
-		// STYLESHEET nth-child SELECTOR e.g. tr:nth-child(odd)  td:nth-child(2n+1)
-		if ($tag=='TR' && isset($p) && $p)  {
-			foreach($p AS $k=>$val) {
-				if (preg_match('/'.$tag.'>>SELECTORNTHCHILD>>(.*)/',$k, $m)) {
-					$select = false;
-					if ($tag=='TR')  {
-						$row = $this->row;
-						$thnr = (isset($this->table[$this->tableLevel][$this->tbctr[$this->tableLevel]]['is_thead']) ? count($this->table[$this->tableLevel][$this->tbctr[$this->tableLevel]]['is_thead']) : 0);
-						$tfnr = (isset($this->table[$this->tableLevel][$this->tbctr[$this->tableLevel]]['is_tfoot']) ? count($this->table[$this->tableLevel][$this->tbctr[$this->tableLevel]]['is_tfoot']) : 0);
-						if ($this->tabletfoot) { $row -= $thnr; }
-						else if (!$this->tablethead) { $row -= ($thnr + $tfnr); }
-						if ($m[1]=='ODD' && ($row % 2) == 0) { $select = true; }
-						else if ($m[1]=='EVEN' && ($row % 2) == 1) { $select = true; }
-						else if (preg_match('/(\d+)N\+(\d+)/',$m[1],$a)) {
-							if ((($row + 1) % $a[1]) == $a[2]) { $select = true; }
-						}
+	}
+	// STYLESHEET nth-child SELECTOR e.g. tr:nth-child(odd)  td:nth-child(2n+1)
+	if ($tag=='TR' && isset($p) && $p)  {
+		foreach($p AS $k=>$val) {
+			if (preg_match('/'.$tag.'>>SELECTORNTHCHILD>>(.*)/',$k, $m)) {
+				$select = false;
+				if ($tag=='TR')  {
+					$row = $this->row;
+					$thnr = (isset($this->table[$this->tableLevel][$this->tbctr[$this->tableLevel]]['is_thead']) ? count($this->table[$this->tableLevel][$this->tbctr[$this->tableLevel]]['is_thead']) : 0);
+					$tfnr = (isset($this->table[$this->tableLevel][$this->tbctr[$this->tableLevel]]['is_tfoot']) ? count($this->table[$this->tableLevel][$this->tbctr[$this->tableLevel]]['is_tfoot']) : 0);
+					if ($this->tabletfoot) { $row -= $thnr; }
+					else if (!$this->tablethead) { $row -= ($thnr + $tfnr); }
+					if ($m[1]=='ODD' && ($row % 2) == 0) { $select = true; }
+					else if ($m[1]=='EVEN' && ($row % 2) == 1) { $select = true; }
+					else if (preg_match('/(\d+)N\+(\d+)/',$m[1],$a)) {
+						if ((($row + 1) % $a[1]) == $a[2]) { $select = true; }
 					}
-					else if ($tag=='TD' || $tag=='TH')  {
-						if ($m[1]=='ODD' && ($this->col % 2) == 0) { $select = true; }
-						else if ($m[1]=='EVEN' && ($this->col % 2) == 1) { $select = true; }
-						else if (preg_match('/(\d+)N\+(\d+)/',$m[1],$a)) {
-							if ((($this->col + 1) % $a[1]) == $a[2]) { $select = true; }
-						}
+				}
+				else if ($tag=='TD' || $tag=='TH')  {
+					if ($m[1]=='ODD' && ($this->col % 2) == 0) { $select = true; }
+					else if ($m[1]=='EVEN' && ($this->col % 2) == 1) { $select = true; }
+					else if (preg_match('/(\d+)N\+(\d+)/',$m[1],$a)) {
+						if ((($this->col + 1) % $a[1]) == $a[2]) { $select = true; }
 					}
-					if ($select) {
-		  				$this->_mergeCSS($p[$tag.'>>SELECTORNTHCHILD>>'.$m[1]], $t);
-					}
+				}
+				if ($select) {
+	  				$this->_mergeCSS($p[$tag.'>>SELECTORNTHCHILD>>'.$m[1]], $t);
 				}
 			}
 		}
-		// STYLESHEET CLASS e.g. #smallone{}  #redletter{}
-		if (isset($id) && $id) {
-		  $this->_mergeCSS($p['ID>>'.$id], $t);
-		}
-		// STYLESHEET CLASS e.g. .smallone{}  .redletter{}
-		foreach($classes AS $class) {
+	}
+	// STYLESHEET CLASS e.g. #smallone{}  #redletter{}
+	if (isset($id) && $id && isset($p['ID>>'.$id])) {
+	  $this->_mergeCSS($p['ID>>'.$id], $t);
+	}
+	// STYLESHEET CLASS e.g. .smallone{}  .redletter{}
+	foreach($classes AS $class) {
+	  if (isset($p[$tag.'>>CLASS>>'.$class]))
 		  $this->_mergeCSS($p[$tag.'>>CLASS>>'.$class], $t);
-		}
-		// STYLESHEET CLASS e.g. #smallone{}  #redletter{}
-		if (isset($id)) {
-		  $this->_mergeCSS($p[$tag.'>>ID>>'.$id], $t);
-		}
+	}
+	// STYLESHEET CLASS e.g. #smallone{}  #redletter{}
+	if (isset($id) && isset($p[$tag.'>>ID>>'.$id])) {
+	  $this->_mergeCSS($p[$tag.'>>ID>>'.$id], $t);
+	}
 }
+
 
 
 function _set_mergedCSS(&$m, &$p, $d=true, $bd=false) {
